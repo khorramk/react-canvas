@@ -68,3 +68,7 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
 
 ### testing react canvas functionality
+
+the point is to combine three.js into react
+
+or turn three.js components into react components

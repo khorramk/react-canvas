@@ -30,7 +30,9 @@ class Scene extends Component {
 
     render(){
         return (
-            <SceneContext.Provider value="i am value">
+            <SceneContext.Provider value={{
+                addAnimateObject: (mesh)=> this.add(mesh)
+            }}>
                 {this.props.children}
             </SceneContext.Provider>
         )
@@ -46,25 +48,80 @@ class Camera extends Component{
 }
 
 class Box extends Component{
-
     render(){
         const geom = new Three.BoxGeometry(this.props.width, this.props.height, this.props.depth);
         const Material = new Three.MeshBasicMaterial(this.props.material);
-        return <BoxContext.Provider/>
+        const mesh = new Three.Mesh(geom, Material);
+        return <BoxContext.Provider value={{
+            mesh:mesh
+        }}>
+            {this.props.children}
+        </BoxContext.Provider>
     }
 }
 
-class App extends Component {
+class Consumer extends Component{
+    constructor(){
+        this.state = {
+            updateContext: {}
+        }
+    }
     componentDidMount(){
+        this.three_renderer = new Three.WebGLRenderer();
+        this.three_renderer.setSize(window.innerWidth, window.innerHeight);
+        this.mount.appendChild(this.renderer.domElement);
+
+        this.renderScene();
+        this.start();
+    }
+
+    renderScene(){
 
     }
+
+    start(){
+
+    }
+
+    stop(){
+
+    }
+    animate(){
+        
+    }
+
+
+    updateScene(mesh, callback){
+        return callback(mesh)
+    }
+
+    render(){
+        return (
+            <SceneContext.Consumer>
+                {/* {(context)=> context.addAnimateObject()}
+                <div ref={(mount)=> this.mount = mount}/> */}
+                {scene => (
+                    <BoxContext.Consumer>
+                        {box => {
+                            this.updateScene(box.mesh, scene.addAnimateObject)
+                            return (
+                                <div ref={(mount)=> this.mount = mount}/>
+                            )
+                        }}
+                    </BoxContext.Consumer>
+                )}
+            </SceneContext.Consumer>
+        )
+    }
+}
+class App extends Component {
     
     render(){
         return (
             <Scene>
-                <Camera/>
+                <Camera />
                     <Box>
-                        <RenderMesh/>
+                        <Consumer/>
                     </Box>
                 <Camera/>
             </Scene>
