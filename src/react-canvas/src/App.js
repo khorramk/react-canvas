@@ -1,26 +1,73 @@
-import React from 'react';
+import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import * as Three from 'three';
+import { Geometry } from 'three';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const SceneContext = React.createContext();
+const CameraContext = React.createContext();
+const BoxContext = React.createContext();
+// class Application {
+//     constructor(){
+//         this.scene = new Three.Scene();
+
+//     }
+
+//     createScene(){
+//         this.scene = new Three.Scene();
+
+//     }
+// }
+
+class Scene extends Component {
+    constructor(){
+        this.scene = new Three.Scene();
+    }
+
+    add(mesh){
+        this.scene.add(mesh);
+    }
+
+    render(){
+        return (
+            <SceneContext.Provider value="i am value">
+                {this.props.children}
+            </SceneContext.Provider>
+        )
+    }
 }
 
-export default App;
+class Camera extends Component{
+    render(){
+        return (
+            <CameraContext.Provider/>
+        )
+    }
+}
+
+class Box extends Component{
+
+    render(){
+        const geom = new Three.BoxGeometry(this.props.width, this.props.height, this.props.depth);
+        const Material = new Three.MeshBasicMaterial(this.props.material);
+        return <BoxContext.Provider/>
+    }
+}
+
+class App extends Component {
+    componentDidMount(){
+
+    }
+    
+    render(){
+        return (
+            <Scene>
+                <Camera/>
+                    <Box>
+                        <RenderMesh/>
+                    </Box>
+                <Camera/>
+            </Scene>
+        )
+    }
+}
