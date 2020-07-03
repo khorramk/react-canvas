@@ -31,7 +31,9 @@ class Scene extends Component {
     render(){
         return (
             <SceneContext.Provider value={{
-                addAnimateObject: (mesh)=> this.add(mesh)
+
+                addAnimateObject: (mesh)=> this.add(mesh),
+                scene: this.scene
             }}>
                 {this.props.children}
             </SceneContext.Provider>
@@ -40,9 +42,18 @@ class Scene extends Component {
 }
 
 class Camera extends Component{
+    constructor(){
+        super()
+        this.camera = new Three.PerspectiveCamera(this.props.fov, this.props.aspect, this.props.near, this.props.far);
+    }
     render(){
         return (
-            <CameraContext.Provider/>
+            <CameraContext.Provider value={{
+                positionX: this.props.positionX,
+                positionY: this.props.positionY
+            }}>
+                {this.props.children}
+            </CameraContext.Provider>
         )
     }
 }
@@ -63,7 +74,8 @@ class Box extends Component{
 class Consumer extends Component{
     constructor(){
         this.state = {
-            updateContext: {}
+            updateContext: {},
+            camera: {}
         }
     }
     componentDidMount(){
@@ -76,15 +88,19 @@ class Consumer extends Component{
     }
 
     renderScene(){
-
+        if(this.renderScene){
+            this.three_renderer.render(this.state.updateContext, this.state.camera)
+        }
     }
 
     start(){
-
+        if(!this.frameID){
+            this.frameID = requestAnimationFrame(this.animate);
+        }
     }
 
     stop(){
-
+        cancelAnimationFrame(this.frameID);
     }
     animate(){
         
@@ -101,14 +117,23 @@ class Consumer extends Component{
                 {/* {(context)=> context.addAnimateObject()}
                 <div ref={(mount)=> this.mount = mount}/> */}
                 {scene => (
-                    <BoxContext.Consumer>
+                    <CameraContext.Consumer>
+                        {camera => (
+                            <BoxContext.Consumer>
                         {box => {
                             this.updateScene(box.mesh, scene.addAnimateObject)
+                            this.setState({
+                                updateContext: scene.scene,
+                                camera: camera.
+                            })
                             return (
                                 <div ref={(mount)=> this.mount = mount}/>
                             )
                         }}
                     </BoxContext.Consumer>
+                        )}
+                    </CameraContext.Consumer>
+                    
                 )}
             </SceneContext.Consumer>
         )
