@@ -31,7 +31,9 @@ class Scene extends Component {
     render(){
         return (
             <SceneContext.Provider value={{
-                addAnimateObject: (mesh)=> this.add(mesh)
+
+                addAnimateObject: (mesh)=> this.add(mesh),
+                scene: this.scene
             }}>
                 {this.props.children}
             </SceneContext.Provider>
@@ -40,20 +42,47 @@ class Scene extends Component {
 }
 
 class Camera extends Component{
+    constructor(){
+        super()
+        this.camera = new Three.PerspectiveCamera(this.props.fov, this.props.aspect, this.props.near, this.props.far);
+        
+    }
+
+    componentDidMount(){
+        this.camera.position.x = this.props.positionX;
+        this.camera.position.y = this.props.positionY;
+        this.camera.position.z = this.props.positionZ;
+    }
     render(){
         return (
-            <CameraContext.Provider/>
+            <CameraContext.Provider value={{
+                camera: this.camera
+            }}>
+                {this.props.children}
+            </CameraContext.Provider>
         )
     }
 }
 
 class Box extends Component{
-    render(){
+    constructor(){
+        this.mesh = {}
+    }
+
+    componentDidMount(){
         const geom = new Three.BoxGeometry(this.props.width, this.props.height, this.props.depth);
         const Material = new Three.MeshBasicMaterial(this.props.material);
-        const mesh = new Three.Mesh(geom, Material);
+        this.mesh = new Three.Mesh(geom, Material);
+    }
+
+    render(){
+        
         return <BoxContext.Provider value={{
-            mesh:mesh
+            mesh: this.mesh,
+            update: (x, y)=> {
+                this.mesh.rotation.x = x;
+                this.mesh.rotation.y = y;
+            }
         }}>
             {this.props.children}
         </BoxContext.Provider>
@@ -63,31 +92,51 @@ class Box extends Component{
 class Consumer extends Component{
     constructor(){
         this.state = {
-            updateContext: {}
+            updateContext: {},
+            camera: {},
+            mesh: {},
+            posX: 0,
+            posY: 0,
         }
     }
     componentDidMount(){
+        const width = this.mount.clientWidth;
+        const height = this.mount.clientHeight;
         this.three_renderer = new Three.WebGLRenderer();
-        this.three_renderer.setSize(window.innerWidth, window.innerHeight);
+        this.three_renderer.setSize(width, height);
         this.mount.appendChild(this.renderer.domElement);
 
         this.renderScene();
         this.start();
     }
 
-    renderScene(){
+    componentWillMount(){
+        this.stop();
+        this.mount.removeChild(this.three_renderer.domElement);
+    }
 
+    renderScene(){
+        if(this.renderScene){
+            this.three_renderer.render(this.state.updateContext, this.state.camera)
+        }
     }
 
     start(){
-
+        if(!this.frameID){
+            this.frameID = requestAnimationFrame(this.animate);
+        }
     }
 
     stop(){
-
+        cancelAnimationFrame(this.frameID);
     }
     animate(){
-        
+        this.setState({
+            posX: posX + 0.01,
+            posY: posY + 0.01
+        })
+        this.renderScene();
+        this.frameID = requestAnimationFrame(this.animate)
     }
 
 
@@ -101,14 +150,24 @@ class Consumer extends Component{
                 {/* {(context)=> context.addAnimateObject()}
                 <div ref={(mount)=> this.mount = mount}/> */}
                 {scene => (
-                    <BoxContext.Consumer>
+                    <CameraContext.Consumer>
+                        {camera => (
+                            <BoxContext.Consumer>
                         {box => {
-                            this.updateScene(box.mesh, scene.addAnimateObject)
+                            scene.addAnimateObject(box.mesh);
+                            this.setState({
+                                updateContext: scene.scene,
+                                camera: camera.camera
+                            })
+                            box.update(this.state.posX, this.state.posY);
                             return (
                                 <div ref={(mount)=> this.mount = mount}/>
                             )
                         }}
                     </BoxContext.Consumer>
+                        )}
+                    </CameraContext.Consumer>
+                    
                 )}
             </SceneContext.Consumer>
         )
@@ -119,8 +178,10 @@ class App extends Component {
     render(){
         return (
             <Scene>
-                <Camera />
-                    <Box>
+                <Camera positionX={0} positionZ={8} positionY={5}/>
+                    <Box width={5} height={5} depth={5} material={{
+                        color: "#ofo"
+                    }}>
                         <Consumer/>
                     </Box>
                 <Camera/>
