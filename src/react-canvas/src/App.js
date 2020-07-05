@@ -21,6 +21,7 @@ const BoxContext = React.createContext();
 
 class Scene extends Component {
     constructor(){
+        super();
         this.scene = new Three.Scene();
     }
 
@@ -44,11 +45,11 @@ class Scene extends Component {
 class Camera extends Component{
     constructor(){
         super()
-        this.camera = new Three.PerspectiveCamera(this.props.fov, this.props.aspect, this.props.near, this.props.far);
         
     }
 
     componentDidMount(){
+        this.camera = new Three.PerspectiveCamera(this.props.fov, this.props.aspect, this.props.near, this.props.far);
         this.camera.position.x = this.props.positionX;
         this.camera.position.y = this.props.positionY;
         this.camera.position.z = this.props.positionZ;
@@ -66,6 +67,7 @@ class Camera extends Component{
 
 class Box extends Component{
     constructor(){
+        super()
         this.mesh = {}
     }
 
@@ -80,8 +82,8 @@ class Box extends Component{
         return <BoxContext.Provider value={{
             mesh: this.mesh,
             update: (x, y)=> {
-                this.mesh.rotation.x = x;
-                this.mesh.rotation.y = y;
+                this.mesh.rotation.x += x;
+                this.mesh.rotation.y += y;
             }
         }}>
             {this.props.children}
@@ -91,6 +93,7 @@ class Box extends Component{
 
 class Consumer extends Component{
     constructor(){
+        super()
         this.state = {
             updateContext: {},
             camera: {},
@@ -112,7 +115,7 @@ class Consumer extends Component{
 
     componentWillMount(){
         this.stop();
-        this.mount.removeChild(this.three_renderer.domElement);
+        // this.mount.removeChild(this.three_renderer.domElement);
     }
 
     renderScene(){
@@ -132,8 +135,8 @@ class Consumer extends Component{
     }
     animate(){
         this.setState({
-            posX: posX + 0.01,
-            posY: posY + 0.01
+            posX: this.state.posX + 0.01,
+            posY: this.state.posY + 0.01
         })
         this.renderScene();
         this.frameID = requestAnimationFrame(this.animate)
@@ -157,7 +160,7 @@ class Consumer extends Component{
                             scene.addAnimateObject(box.mesh);
                             this.setState({
                                 updateContext: scene.scene,
-                                camera: camera.camera
+                                camera: camera
                             })
                             box.update(this.state.posX, this.state.posY);
                             return (
@@ -178,7 +181,7 @@ class App extends Component {
     render(){
         return (
             <Scene>
-                <Camera positionX={0} positionZ={8} positionY={5}/>
+                <Camera fov={75} aspect={window.innerWidth / window.innerHeight} near={0.1} far={1000} positionX={0} positionZ={8} positionY={5}/>
                     <Box width={5} height={5} depth={5} material={{
                         color: "#ofo"
                     }}>
@@ -189,3 +192,5 @@ class App extends Component {
         )
     }
 }
+
+export default App;
