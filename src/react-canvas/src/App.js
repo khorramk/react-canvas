@@ -7,26 +7,22 @@ import { Geometry } from 'three';
 const SceneContext = React.createContext();
 const CameraContext = React.createContext();
 const BoxContext = React.createContext();
-// class Application {
-//     constructor(){
-//         this.scene = new Three.Scene();
 
-//     }
-
-//     createScene(){
-//         this.scene = new Three.Scene();
-
-//     }
-// }
 
 class Scene extends Component {
     constructor(){
         super();
         this.scene = new Three.Scene();
+
+        
     }
 
     add(mesh){
         this.scene.add(mesh);
+    }
+
+    animate(){
+        
     }
 
     render(){
@@ -43,18 +39,19 @@ class Scene extends Component {
 }
 
 class Camera extends Component{
-    constructor(){
-        super()
+    constructor(props){
+        super(props)
         
     }
 
-    componentDidMount(){
-        this.camera = new Three.PerspectiveCamera(this.props.fov, this.props.aspect, this.props.near, this.props.far);
+    componentDidUpdate(){
         this.camera.position.x = this.props.positionX;
         this.camera.position.y = this.props.positionY;
         this.camera.position.z = this.props.positionZ;
     }
     render(){
+        this.camera = new Three.PerspectiveCamera(this.props.fov, this.props.aspect, this.props.near, this.props.far);
+
         return (
             <CameraContext.Provider value={{
                 camera: this.camera
@@ -66,24 +63,24 @@ class Camera extends Component{
 }
 
 class Box extends Component{
-    constructor(){
-        super()
+    constructor(props){
+        super(props)
         this.mesh = {}
     }
 
-    componentDidMount(){
+    componentWillMount(){
         const geom = new Three.BoxGeometry(this.props.width, this.props.height, this.props.depth);
         const Material = new Three.MeshBasicMaterial(this.props.material);
         this.mesh = new Three.Mesh(geom, Material);
     }
 
     render(){
-        
+        const self = this;
         return <BoxContext.Provider value={{
             mesh: this.mesh,
             update: (x, y)=> {
-                this.mesh.rotation.x += x;
-                this.mesh.rotation.y += y;
+                self.mesh.rotation.x += x;
+                self.mesh.rotation.y += y;
             }
         }}>
             {this.props.children}
@@ -92,22 +89,17 @@ class Box extends Component{
 }
 
 class Consumer extends Component{
-    constructor(){
-        super()
-        this.state = {
-            updateContext: {},
-            camera: {},
-            mesh: {},
-            posX: 0,
-            posY: 0,
-        }
+    constructor(props){
+        super(props)
+        this.start.bind(this);
+        this.stop.bind(this);
     }
-    componentDidMount(){
+    componentDidUpdate(){
         const width = this.mount.clientWidth;
         const height = this.mount.clientHeight;
         this.three_renderer = new Three.WebGLRenderer();
         this.three_renderer.setSize(width, height);
-        this.mount.appendChild(this.renderer.domElement);
+        this.mount.appendChild(this.three_renderer.domElement);
 
         this.renderScene();
         this.start();
@@ -134,10 +126,6 @@ class Consumer extends Component{
         cancelAnimationFrame(this.frameID);
     }
     animate(){
-        this.setState({
-            posX: this.state.posX + 0.01,
-            posY: this.state.posY + 0.01
-        })
         this.renderScene();
         this.frameID = requestAnimationFrame(this.animate)
     }
@@ -157,12 +145,7 @@ class Consumer extends Component{
                         {camera => (
                             <BoxContext.Consumer>
                         {box => {
-                            scene.addAnimateObject(box.mesh);
-                            this.setState({
-                                updateContext: scene.scene,
-                                camera: camera
-                            })
-                            box.update(this.state.posX, this.state.posY);
+                            scene.scene(add)
                             return (
                                 <div ref={(mount)=> this.mount = mount}/>
                             )
