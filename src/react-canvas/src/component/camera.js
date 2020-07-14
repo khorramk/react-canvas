@@ -1,7 +1,8 @@
-const { Camera } = require("three");
+import React, { useState, useRef } from 'react';
+import THREE from 'three';
 
-import React from 'react';
-
-const camera = (props) => <Camera.Provider value={}>
-    {props.children}
-</Camera.Provider>
+const camera = (props) => {
+    const cameraRef = useRef(new THREE.PerspectiveCamera(props.fov, props.aspectRatio, props.far, props.close));
+    cameraRef.current.position.z = 20;
+    return null;
+}
