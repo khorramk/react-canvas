@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-import * as Three from 'three';
-import { Geometry } from 'three';
+import {Scene} from './component/Scene';
+import {Camera} from './component/camera';
+import {Box} from './component/Box';
+import Renderer from './component/Renderer';
+// import logo from './logo.svg';
+// import './App.css';
+// import * as Three from 'three';
+// import { Geometry } from 'three';
 
-const SceneContext = React.createContext();
-const CameraContext = React.createContext();
-const BoxContext = React.createContext();
+// const SceneContext = React.createContext();
+// const CameraContext = React.createContext();
+// const BoxContext = React.createContext();
 
 
 // class Scene extends Component {
@@ -168,18 +172,14 @@ class App extends Component {
     
     render(){
         return (
-            <Renderer>
-                <Scene>
-                <Camera fov={75} aspect={window.innerWidth / window.innerHeight} near={0.1} far={1000} positionX={0} positionZ={8} positionY={5}/>
-                    <Box width={5} height={5} depth={5} material={{
-                        color: "#ofo"
-                    }}>
-                       
-                    </Box>
-                <Camera/>
-            </Scene>
-            </Renderer>
+            <div>
+               <Renderer></Renderer>
+                   <Camera z={20} fov={75} aspect={window.innerWidth / window.innerHeight} far={10} near={2000}></Camera>
+                   <Scene>
+                       <Box width={100} height={100}></Box>
+                   </Scene>
             
+            </div>
         )
     }
 }

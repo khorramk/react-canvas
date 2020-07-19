@@ -1,16 +1,25 @@
-import React from 'react';
+import React, { useRef, useContext, createContext,useEffect } from 'react';
+import * as THREE from 'three';
+import {SceneContext} from './Scene';
+import {Cameracontext} from './camera';
+const renderThree = new THREE.WebGL1Renderer();
+const Rendercontext = createContext({renderThree})
+const Renderer = (props)=> {
 
-class Renderer extends React.Component{
-    componentWillMount(){
-        var renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
-    }
-    render(){
-        return (
-            <div ref={(mount) => this.mount = mount}>
-
-            </div>
-        )
-    }
+    // const renderRef = useRef(new THREE.WebGLRenderer());
+    const renderElement = useRef(null);
+    const {reactScene} = useContext(SceneContext);
+    const {cameras} = useContext(Cameracontext);
+    const { renderThree } = useContext(Rendercontext);
+    renderThree.setSize(props.width, props.height);
+    useEffect(() => {
+        renderElement.current.appendChild(renderThree.domElement);
+    //update render on scene
+    renderThree.render(reactScene, cameras);
+    });
+    return (
+        <div ref={renderElement}/>
+    )
 }
+
+export default Renderer;
