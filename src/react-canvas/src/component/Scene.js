@@ -1,20 +1,10 @@
-import React, {useRef, useEffect, useContext, createContext} from 'react';
-import * as THREE from 'three';
-import {BoxContext} from './Box';
-import {Cameracontext} from './camera';
-const reactScene = new THREE.Scene();
-const SceneContext = createContext({reactScene})
+import React from 'react';
+
 const Scene = (props) => {
-    const sceneRef = useRef(new THREE.Scene());
-    const { boxes } = useContext(BoxContext);
-    const {reactScene} = useContext(SceneContext);
-   // const {cameras} = useContext(Cameracontext);
-    reactScene.add(boxes);
+    
     return (
-        <SceneContext.Provider value={{reactScene}}>
-            {props.children}
-        </SceneContext.Provider>
+        <React.Fragment></React.Fragment>
     );
 }
 
-export {SceneContext, Scene};
+export default Scene;

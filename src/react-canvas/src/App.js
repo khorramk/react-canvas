@@ -1,39 +1,9 @@
 import React, { Component } from 'react';
-import {Scene} from './component/Scene';
+import Scene from './component/Scene';
 import {Camera} from './component/camera';
 import {Box} from './component/Box';
 import Renderer from './component/Renderer';
-// import logo from './logo.svg';
-// import './App.css';
-// import * as Three from 'three';
-// import { Geometry } from 'three';
 
-// const SceneContext = React.createContext();
-// const CameraContext = React.createContext();
-// const BoxContext = React.createContext();
-
-
-// class Scene extends Component {
-//     constructor(){
-//         super();
-//         this.scene = new Three.Scene();
-
-        
-//     }
-
-//     add(mesh){
-//         this.scene.add(mesh);
-//     }
-
-//     animate(){
-        
-//     }
-
-//     render(){
-//         return (
-//             <SceneContext.Provider value={{
-
-//                 addAnimateObject: (mesh)=> this.add(mesh),
 //                 scene: this.scene
 //             }}>
 //                 {this.props.children}
@@ -141,47 +111,22 @@ import Renderer from './component/Renderer';
 
 
 //     updateScene(mesh, callback){
-//         return callback(mesh)
-//     }
-
-//     render(){
-//         return (
-//             <SceneContext.Consumer>
-//                 {/* {(context)=> context.addAnimateObject()}
-//                 <div ref={(mount)=> this.mount = mount}/> */}
-//                 {scene => (
-//                     <CameraContext.Consumer>
-//                         {camera => (
-//                             <BoxContext.Consumer>
-//                         {box => {
-                
-//                             return (
-//                                 <div ref={(mount)=> this.mount = mount}/>
-//                             )
-//                         }}
-//                     </BoxContext.Consumer>
-//                         )}
-//                     </CameraContext.Consumer>
-                    
-//                 )}
-//             </SceneContext.Consumer>
-//         )
-//     }
-// }
-class App extends Component {
+//         return callback(m
+function App(){
     
-    render(){
+    
         return (
             <div>
-               <Renderer></Renderer>
-                   <Camera z={20} fov={75} aspect={window.innerWidth / window.innerHeight} far={10} near={2000}></Camera>
-                   <Scene>
-                       <Box width={100} height={100}></Box>
-                   </Scene>
-            
+                <Box width={100} height={100}>
+                        <Scene>
+                            <Camera z={20} fov={75} aspect={window.innerWidth / window.innerHeight} far={10} near={2000}>
+                                <Renderer width={window.innerWidth} height={window.innerHeight}>hello</Renderer>
+                            </Camera>
+                        </Scene>
+                </Box>
             </div>
         )
-    }
+    
 }
 
 export default App;
