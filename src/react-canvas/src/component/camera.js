@@ -1,16 +1,19 @@
-import React, { useState, useRef, createContext, useContext } from 'react';
-import * as THREE from 'three';
-let camera = {};
-const Cameracontext = createContext({camera})
+import React, {  createContext } from 'react';
+const Cameracontext = createContext({})
+
 const Camera = (props) => {
-    let {camera} = useContext(Cameracontext);
-    camera = new THREE.PerspectiveCamera(props.fov, props.aspectRatio, props.far, props.close);
-    camera.position.z = props.z;
+    const {z, fov, aspect, far, near} = props
     return (
-        <Cameracontext.Provider value={{camera}}>
-            {props.children}
+        <Cameracontext.Provider value={{
+            z,
+            fov,
+            aspect,
+            far,
+            near
+        }}>
+                {props.children}
         </Cameracontext.Provider>
-    );
+    )
 }
 
 export {Cameracontext, Camera};
